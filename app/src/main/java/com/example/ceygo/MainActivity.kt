@@ -1,36 +1,60 @@
 package com.example.ceygo
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
+
+    // keep one instance per tab (so scroll position etc. is preserved)
+    private val fragments: MutableMap<Int, Fragment> = mutableMapOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val bottom = findViewById<BottomNavigationView>(R.id.bottomNav)
+
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.nav_host, HomeFragment())
-                .commit()
+            // default tab
+            bottom.selectedItemId = R.id.tab_home
+            showTab(R.id.tab_home)
         }
 
-        val bottom = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottom.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.tab_home -> { swap(HomeFragment()); true }
-                else -> { /* stub fragments */ true }
-            }
+            showTab(it.itemId)
+            true
         }
-        bottom.selectedItemId = R.id.tab_home
+
+        // optional: do nothing when reselecting same tab
+        bottom.setOnItemReselectedListener { /* no-op */ }
     }
 
-    private fun swap(f: Fragment) =
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.nav_host, f)
-            .commit()
+    private fun showTab(tabId: Int) {
+        val tag = tabId.toString()
+        val fm = supportFragmentManager
+        val current = fm.findFragmentById(R.id.nav_host)
+
+        // find or create the fragment for the selected tab
+        val next = fragments.getOrPut(tabId) {
+            when (tabId) {
+                R.id.tab_home    -> HomeFragment()
+                R.id.tab_explore -> ExploreFragment()
+                R.id.tab_saved   -> SavedFragment()
+                R.id.tab_profile -> ProfileFragment()
+                else -> HomeFragment()
+            }.also { frag ->
+                fm.beginTransaction()
+                    .add(R.id.nav_host, frag, tag)
+                    .hide(frag)     // will show below
+                    .commitNow()
+            }
+        }
+
+        fm.beginTransaction().apply {
+            current?.let { hide(it) }
+            show(next)
+        }.commit()
+    }
 }

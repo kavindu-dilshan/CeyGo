@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Makes corners fully rounded (useful for circular avatars) -->
-    <!--<style name="ShapeAppearanceOverlay.App.Corner">
+    <style name="ShapeAppearanceOverlay.App.Corner.Full" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
-    <style name="ShapeAppearanceOverlay.App.Corner.Full">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>  &lt;!&ndash; 50% = perfect circle &ndash;&gt;
-    </style>
-    <style name="ShapeAppearanceOverlay.App">
-        <item name="cornerFamily">rounded</item>
-        &lt;!&ndash; 50% makes a perfect circle for square views like 40dp x 40dp avatars &ndash;&gt;
-        <item name="cornerSize">50%</item>
-    </style>-->
 </resources>
