@@ -7,8 +7,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    // keep one instance per tab (so scroll position etc. is preserved)
-    private val fragments: MutableMap<Int, Fragment> = mutableMapOf()
+    private val fragments = mutableMapOf<Int, Fragment>()
+    private var activeTabId: Int = R.id.tab_home   // track which one is visible
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,45 +16,72 @@ class MainActivity : AppCompatActivity() {
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNav)
 
+        // restore already-added fragments after process death / config change
+        restoreFragments()
+
         if (savedInstanceState == null) {
-            // default tab
+            // create and show Home as the first screen
+            val home = obtainFragment(R.id.tab_home)
+            supportFragmentManager.beginTransaction()
+                .add(R.id.nav_host, home, tagOf(R.id.tab_home))
+                .show(home)
+                .commit()
+            fragments[R.id.tab_home] = home
+            activeTabId = R.id.tab_home
             bottom.selectedItemId = R.id.tab_home
-            showTab(R.id.tab_home)
         }
 
         bottom.setOnItemSelectedListener {
             showTab(it.itemId)
             true
         }
-
-        // optional: do nothing when reselecting same tab
         bottom.setOnItemReselectedListener { /* no-op */ }
     }
 
     private fun showTab(tabId: Int) {
-        val tag = tabId.toString()
-        val fm = supportFragmentManager
-        val current = fm.findFragmentById(R.id.nav_host)
+        if (tabId == activeTabId) return
 
-        // find or create the fragment for the selected tab
+        val fm = supportFragmentManager
         val next = fragments.getOrPut(tabId) {
-            when (tabId) {
-                R.id.tab_home    -> HomeFragment()
-                R.id.tab_explore -> ExploreFragment()
-                R.id.tab_saved   -> SavedFragment()
-                R.id.tab_profile -> ProfileFragment()
-                else -> HomeFragment()
-            }.also { frag ->
+            obtainFragment(tabId).also { frag ->
                 fm.beginTransaction()
-                    .add(R.id.nav_host, frag, tag)
-                    .hide(frag)     // will show below
+                    .add(R.id.nav_host, frag, tagOf(tabId))
+                    .hide(frag)                // add hidden first
                     .commitNow()
             }
         }
+        val current = fragments[activeTabId]
 
         fm.beginTransaction().apply {
             current?.let { hide(it) }
             show(next)
+            setPrimaryNavigationFragment(next)  // optional, helps back press
         }.commit()
+
+        activeTabId = tabId
+    }
+
+    private fun obtainFragment(tabId: Int): Fragment = when (tabId) {
+        R.id.tab_home    -> HomeFragment()
+        R.id.tab_explore -> ExploreFragment()
+        R.id.tab_saved   -> SavedFragment()
+        R.id.tab_profile -> ProfileFragment()
+        else -> HomeFragment()
+    }
+
+    private fun tagOf(tabId: Int) = "tab:$tabId"
+
+    private fun restoreFragments() {
+        val fm = supportFragmentManager
+        listOf(
+            R.id.tab_home,
+            R.id.tab_explore,
+            R.id.tab_saved,
+            R.id.tab_profile
+        ).forEach { id ->
+            fm.findFragmentByTag(tagOf(id))?.let { fragments[id] = it }
+        }
+        // figure out which one is currently visible (if any)
+        fragments.forEach { (id, f) -> if (!f.isHidden) activeTabId = id }
     }
 }

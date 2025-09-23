@@ -37,7 +37,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     5.0,
                     "https://picsum.photos/seed/sigiriya/600/400"
                 ),
-                Destination("Galle Fort", "Galle, Sri Lanka.", 4.9, "https://picsum.photos/seed/galle/600/400")
+                Destination("Galle Fort",
+                    "Galle, Sri Lanka.",
+                    4.9,
+                    "https://picsum.photos/seed/galle/600/400")
             )
         )
         nearbyAdapter.submit(
