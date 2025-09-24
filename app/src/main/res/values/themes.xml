@@ -2,8 +2,6 @@
     <style name="Base.Theme.CeyGo" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Your colors -->
         <item name="colorPrimary">@color/primaryBlue</item>
-
-        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="Theme.CeyGo" parent="Base.Theme.CeyGo" />

@@ -3,10 +3,12 @@ package com.example.ceygo
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.ceygo.data.LocationsRepository
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,7 +25,12 @@ class MainActivity : AppCompatActivity() {
         splashScreen.setKeepOnScreenCondition { keepOnScreen }
         Handler(Looper.getMainLooper()).postDelayed({ keepOnScreen = false }, 2000)
 
+        window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
         setContentView(R.layout.activity_main)
+
+        // Initialize database-backed repository once per app start
+        LocationsRepository.initialize(applicationContext)
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNav)
 
