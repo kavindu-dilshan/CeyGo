@@ -5,10 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ceygo.ui.NearbyAdapter
 import com.example.ceygo.ui.PopularAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.example.ceygo.model.Destination
+import com.example.ceygo.data.LocationsRepository
+import com.example.ceygo.ui.location.SingleLocationFragment
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -16,8 +17,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var nearbyAdapter: NearbyAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        popularAdapter = PopularAdapter { /* TODO: navigate to detail */ }
-        nearbyAdapter  = NearbyAdapter  { /* TODO: navigate to detail */ }
+        // Adapters now take Location and open SingleLocationFragment by id
+        popularAdapter = PopularAdapter { loc ->
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host, SingleLocationFragment.newInstance(loc.id))
+                .addToBackStack("single_location")
+                .commit()
+        }
+        nearbyAdapter  = NearbyAdapter { loc ->
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host, SingleLocationFragment.newInstance(loc.id))
+                .addToBackStack("single_location")
+                .commit()
+        }
 
         view.findViewById<RecyclerView>(R.id.rvPopular).apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
@@ -28,29 +40,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             adapter = nearbyAdapter
         }
 
-        // Faux data to mirror the mock
-        popularAdapter.submit(
-            listOf(
-                Destination(
-                    "Sigiriya",
-                    "Sigiriya, Sri Lanka.",
-                    5.0,
-                    "https://picsum.photos/seed/sigiriya/600/400"
-                ),
-                Destination("Galle Fort",
-                    "Galle, Sri Lanka.",
-                    4.9,
-                    "https://picsum.photos/seed/galle/600/400")
-            )
-        )
-        nearbyAdapter.submit(
-            listOf(
-                Destination("Ambuluwawa Tower", "", 4.5, "https://picsum.photos/seed/ambuluwawa/600/600"),
-                Destination("Sri Dalada Maligawa", "", 4.3, "https://picsum.photos/seed/maligawa/600/600")
-            )
-        )
+        // Pull all seeded locations and split into "popular" & "nearby" as you like.
+        // Example: popular = top 2 by rating, nearby = the rest.
+        val all = LocationsRepository.locations()
+        val popular = all.sortedByDescending { it.rating }.take(2)
+        val nearby  = all.minus(popular)
 
-        // Optional: change greeting name dynamically
+        popularAdapter.submit(popular)
+        nearbyAdapter.submit(nearby)
+
         view.findViewById<TextView>(R.id.tvHello).text = "Hello, Dileena"
     }
 }

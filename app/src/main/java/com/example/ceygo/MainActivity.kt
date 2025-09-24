@@ -1,9 +1,12 @@
 package com.example.ceygo
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,7 +14,15 @@ class MainActivity : AppCompatActivity() {
     private var activeTabId: Int = R.id.tab_home   // track which one is visible
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install the splash screen as early as possible
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // Keep splash for 2 seconds
+        var keepOnScreen = true
+        splashScreen.setKeepOnScreenCondition { keepOnScreen }
+        Handler(Looper.getMainLooper()).postDelayed({ keepOnScreen = false }, 2000)
+
         setContentView(R.layout.activity_main)
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNav)

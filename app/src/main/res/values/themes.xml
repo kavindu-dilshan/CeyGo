@@ -7,4 +7,11 @@
     </style>
 
     <style name="Theme.CeyGo" parent="Base.Theme.CeyGo" />
+
+    <!-- Splash theme shown at cold start -->
+    <style name="Theme.CeyGo.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primaryBlue</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.CeyGo</item>
+    </style>
 </resources>
