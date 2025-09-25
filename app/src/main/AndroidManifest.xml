@@ -15,15 +15,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CeyGo">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.auth.EntryActivity"
             android:exported="true"
-            android:theme="@style/Theme.CeyGo.Splash">
+            android:theme="@style/Theme.CeyGo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.auth.SignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.SignUpActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CeyGo.Splash" />
     </application>
 
 </manifest>

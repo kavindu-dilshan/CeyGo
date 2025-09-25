@@ -1,12 +1,12 @@
 package com.example.ceygo.data
 
 import android.content.Context
-import androidx.room.Room
 import com.example.ceygo.data.db.AppDatabase
 import com.example.ceygo.data.db.LocationEntity
 import com.example.ceygo.data.db.LocationImageEntity
 import com.example.ceygo.data.db.LocationWithDetails
 import com.example.ceygo.data.db.ReviewEntity
+import com.example.ceygo.data.db.DatabaseProvider
 import com.example.ceygo.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,11 +33,7 @@ object LocationsRepository {
             // Prefill in-memory state so screens have immediate data
             _items.value = seed()
 
-            db = Room.databaseBuilder(
-                context.applicationContext,
-                AppDatabase::class.java,
-                "ceygo.db"
-            ).build()
+            db = DatabaseProvider.get(context)
 
             // Start collecting DB into memory state
             scope.launch {
