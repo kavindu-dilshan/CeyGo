@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.ceygo.data.LocationsRepository
+import com.example.ceygo.data.migrate.MigrationRunner
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        // Initialize database-backed repository once per app start
+        // One-time migration from Room -> Firestore, then initialize repository
+        MigrationRunner.runOnce(applicationContext)
         LocationsRepository.initialize(applicationContext)
 
         val bottom = findViewById<BottomNavigationView>(R.id.bottomNav)

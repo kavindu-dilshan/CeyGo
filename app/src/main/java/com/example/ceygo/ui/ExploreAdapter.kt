@@ -9,16 +9,24 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.ceygo.R
 import com.example.ceygo.model.Location
+import androidx.core.content.ContextCompat
 
 class ExploreAdapter(
-    private val onClick: (Location) -> Unit
+    private val onClick: (Location) -> Unit,
+    private val onToggleSave: (Location) -> Unit
 ) : RecyclerView.Adapter<ExploreAdapter.VH>() {
 
     private val items = mutableListOf<Location>()
+    private var saved: Set<String> = emptySet()
 
     fun submit(list: List<Location>) {
         items.clear()
         items.addAll(list)
+        notifyDataSetChanged()
+    }
+
+    fun setSaved(savedIds: Set<String>) {
+        saved = savedIds
         notifyDataSetChanged()
     }
 
@@ -58,6 +66,11 @@ class ExploreAdapter(
         }
 
         holder.v.setOnClickListener { onClick(loc) }
-        // holder.fav.setOnClickListener { /* toggle favorite if you want */ }
+        // Update saved icon state
+        val isSaved = saved.contains(loc.id)
+        holder.fav.setImageResource(R.drawable.ic_heart)
+        val color = if (isSaved) R.color.primaryBlue else android.R.color.darker_gray
+        holder.fav.setColorFilter(ContextCompat.getColor(holder.fav.context, color))
+        holder.fav.setOnClickListener { onToggleSave(loc) }
     }
 }

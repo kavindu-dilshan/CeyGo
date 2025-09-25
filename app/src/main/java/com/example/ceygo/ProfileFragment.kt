@@ -9,8 +9,6 @@ import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import coil.load
-import com.example.ceygo.data.auth.AuthRepository
-import com.example.ceygo.data.db.DatabaseProvider
 import android.content.Intent
 import com.example.ceygo.ui.auth.SignInActivity
 import com.google.android.material.button.MaterialButton
@@ -18,6 +16,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
+import com.example.ceygo.data.auth.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -28,17 +28,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
     private var selectedAvatar: Uri? = null
-    private var currentUserId: Int = -1
     private lateinit var auth: AuthRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         auth = AuthRepository.create(requireContext())
-
-        // Determine current user id either from intent extra or remembered session
-        val passedId = activity?.intent?.getIntExtra("user_id", -1) ?: -1
-        currentUserId = if (passedId != -1) passedId else auth.rememberedUserId()
 
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
             activity?.onBackPressedDispatcher?.onBackPressed()
@@ -88,20 +83,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun loadUser(root: View) {
-        if (currentUserId == -1) return
-        viewLifecycleOwner.lifecycleScope.launch {
-            // simple load via DAO through repo
-            val db = DatabaseProvider.get(requireContext())
-            val user = db.userDao().findById(currentUserId)
-            user?.let {
-                root.findViewById<TextInputEditText>(R.id.etName).setText(it.name)
-                root.findViewById<TextInputEditText>(R.id.etEmail).setText(it.email)
-                // do not set password for security; user can type new one
-                it.avatarUri?.let { uri ->
-                    root.findViewById<ImageView>(R.id.imgAvatar).load(uri)
-                }
-            }
-        }
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        root.findViewById<TextInputEditText>(R.id.etName).setText(user.displayName ?: "")
+        root.findViewById<TextInputEditText>(R.id.etEmail).setText(user.email ?: "")
+        user.photoUrl?.let { uri -> root.findViewById<ImageView>(R.id.imgAvatar).load(uri) }
     }
 
     private fun persistUpdate(root: View) {
@@ -111,7 +96,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val avatar = selectedAvatar?.toString()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val res = auth.updateUser(currentUserId, name, email, password, avatar)
+            val res = auth.updateUser(name, email, password, avatar)
             res.onSuccess {
                 Snackbar.make(root, "Profile updated", Snackbar.LENGTH_SHORT).show()
                 // clear password field
@@ -125,7 +110,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private fun deleteAccount() {
         val root = view ?: return
         viewLifecycleOwner.lifecycleScope.launch {
-            auth.deleteUser(currentUserId)
+            auth.deleteCurrentUser()
             Snackbar.make(root, "Account deleted", Snackbar.LENGTH_SHORT).show()
             // Navigate to SignIn
             startActivity(Intent(requireContext(), SignInActivity::class.java))

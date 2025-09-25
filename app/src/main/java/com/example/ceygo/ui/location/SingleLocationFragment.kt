@@ -16,6 +16,8 @@ import com.example.ceygo.R
 import com.example.ceygo.model.Review
 import com.example.ceygo.ui.LocationsViewModel
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class SingleLocationFragment : Fragment(R.layout.fragment_single_location) {
@@ -65,9 +67,13 @@ class SingleLocationFragment : Fragment(R.layout.fragment_single_location) {
                     tvDistrict.text = "District: ${loc.district}"
                     tvDesc.text = loc.description
                     (pager.adapter as ImagePagerAdapter).submit(loc.images)
-                    reviewAdapter.submitList(loc.reviews.toList())
                 }
         }
+
+        // Observe reviews from Firestore in real-time
+        vm.reviews(locationId)
+            .onEach { list -> reviewAdapter.submitList(list) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         // Open bottom sheet
         view.findViewById<View>(R.id.btnWriteReview).setOnClickListener {
@@ -83,7 +89,7 @@ class SingleLocationFragment : Fragment(R.layout.fragment_single_location) {
             val text = b.getString("text").orElse("")
             val rating = b.getInt("rating")
             if (text.isNotBlank()) {
-                vm.addReview(id, Review(author = "You", rating = rating, text = text))
+                vm.addReview(id, Review(author = "", rating = rating, text = text))
             }
         }
     }

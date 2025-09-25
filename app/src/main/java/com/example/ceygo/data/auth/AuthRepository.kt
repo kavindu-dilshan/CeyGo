@@ -2,69 +2,119 @@ package com.example.ceygo.data.auth
 
 import android.content.Context
 import android.util.Patterns
-import com.example.ceygo.data.db.DatabaseProvider
-import com.example.ceygo.data.db.user.UserDao
-import com.example.ceygo.data.db.user.UserEntity
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.security.MessageDigest
 
-class AuthRepository(private val userDao: UserDao, private val session: SessionManager) {
+class AuthRepository(private val session: SessionManager) {
 
     companion object {
         fun create(context: Context): AuthRepository {
-            val db = DatabaseProvider.get(context)
-            return AuthRepository(db.userDao(), SessionManager(context))
-        }
-
-        private fun hashPassword(password: String): String {
-            val md = MessageDigest.getInstance("SHA-256")
-            val bytes = md.digest(password.toByteArray())
-            return bytes.joinToString("") { "%02x".format(it) }
+            return AuthRepository(SessionManager(context))
         }
     }
 
-    suspend fun hasAnyUser(): Boolean = withContext(Dispatchers.IO) {
-        userDao.countUsers() > 0
-    }
+    private val auth by lazy { FirebaseAuth.getInstance() }
+    private val firestore by lazy { FirebaseFirestore.getInstance() }
 
-    suspend fun signUp(name: String, email: String, password: String): Result<Int> = withContext(Dispatchers.IO) {
+    suspend fun signUp(name: String, email: String, password: String): Result<Unit> = withContext(Dispatchers.IO) {
         if (name.isBlank()) return@withContext Result.failure(IllegalArgumentException("Name is required"))
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) return@withContext Result.failure(IllegalArgumentException("Invalid email"))
         if (password.length < 8) return@withContext Result.failure(IllegalArgumentException("Password must be at least 8 characters"))
-        val existing = userDao.findByEmail(email)
-        if (existing != null) return@withContext Result.failure(IllegalStateException("Email already exists"))
-        val id = userDao.insert(UserEntity(name = name, email = email, passwordHash = hashPassword(password))).toInt()
-        Result.success(id)
+
+        try {
+            val cred = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = cred.user ?: return@withContext Result.failure(IllegalStateException("User create failed"))
+            // Update profile display name
+            val profileReq = com.google.firebase.auth.userProfileChangeRequest { displayName = name }
+            user.updateProfile(profileReq).await()
+            // Create/merge user doc
+            firestore.collection("users").document(user.uid).set(
+                mapOf(
+                    "name" to name,
+                    "email" to email,
+                    "avatarUri" to (user.photoUrl?.toString())
+                )
+            ).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    suspend fun signIn(email: String, password: String, keepLogged: Boolean): Result<Int> = withContext(Dispatchers.IO) {
+    suspend fun signIn(email: String, password: String, keepLogged: Boolean): Result<Unit> = withContext(Dispatchers.IO) {
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) return@withContext Result.failure(IllegalArgumentException("Invalid email"))
-        val user = userDao.findByEmail(email) ?: return@withContext Result.failure(IllegalArgumentException("Email not found"))
-        val hash = hashPassword(password)
-        if (user.passwordHash != hash) return@withContext Result.failure(IllegalArgumentException("Incorrect password"))
-        if (keepLogged) session.rememberedUserId = user.id else session.clearRemembered()
-        Result.success(user.id)
+        return@withContext try {
+            val cred = auth.signInWithEmailAndPassword(email, password).await()
+            val user = cred.user ?: return@withContext Result.failure(IllegalStateException("Sign in failed"))
+            if (keepLogged) session.rememberedUid = user.uid else session.clearRemembered()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    suspend fun updateUser(id: Int, name: String, email: String, password: String?, avatarUri: String?): Result<Unit> = withContext(Dispatchers.IO) {
-        val current = userDao.findById(id) ?: return@withContext Result.failure(IllegalArgumentException("User not found"))
+    suspend fun updateUser(name: String, email: String, password: String?, avatarUri: String?): Result<Unit> = withContext(Dispatchers.IO) {
+        val user = auth.currentUser ?: return@withContext Result.failure(IllegalStateException("Not signed in"))
         if (name.isBlank()) return@withContext Result.failure(IllegalArgumentException("Name is required"))
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) return@withContext Result.failure(IllegalArgumentException("Invalid email"))
-        val updated = current.copy(
-            name = name,
-            email = email,
-            passwordHash = password?.let { hashPassword(it) } ?: current.passwordHash,
-            avatarUri = avatarUri
-        )
-        userDao.update(updated)
-        Result.success(Unit)
+        try {
+            // Update profile
+            val profileReq = com.google.firebase.auth.userProfileChangeRequest {
+                displayName = name
+                avatarUri?.let { photoUri = android.net.Uri.parse(it) }
+            }
+            user.updateProfile(profileReq).await()
+            if (user.email != email) user.updateEmail(email).await()
+            if (!password.isNullOrBlank()) user.updatePassword(password).await()
+            // Update Firestore doc
+            firestore.collection("users").document(user.uid).set(
+                mapOf(
+                    "name" to name,
+                    "email" to email,
+                    "avatarUri" to avatarUri
+                ),
+                com.google.firebase.firestore.SetOptions.merge()
+            ).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    suspend fun deleteUser(id: Int) = withContext(Dispatchers.IO) {
-        userDao.findById(id)?.let { userDao.delete(it) }
-        if (session.rememberedUserId == id) session.clearRemembered()
+    suspend fun deleteCurrentUser() = withContext(Dispatchers.IO) {
+        val user = auth.currentUser ?: return@withContext
+        try {
+            firestore.collection("users").document(user.uid).delete().await()
+            user.delete().await()
+            session.clearRemembered()
+        } catch (_: Exception) { }
     }
 
-    fun rememberedUserId(): Int = session.rememberedUserId
+    suspend fun signInWithGoogle(account: GoogleSignInAccount): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            val res = auth.signInWithCredential(credential).await()
+            val user = res.user ?: return@withContext Result.failure(IllegalStateException("Google sign-in failed"))
+            session.rememberedUid = user.uid
+            // Ensure user doc exists/updated
+            firestore.collection("users").document(user.uid).set(
+                mapOf(
+                    "name" to (user.displayName ?: "User"),
+                    "email" to (user.email ?: ""),
+                    "avatarUri" to (user.photoUrl?.toString())
+                ),
+                com.google.firebase.firestore.SetOptions.merge()
+            ).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun currentUid(): String? = auth.currentUser?.uid ?: session.rememberedUid
 }

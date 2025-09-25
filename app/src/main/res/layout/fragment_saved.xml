@@ -106,6 +106,17 @@
         </com.google.android.material.chip.ChipGroup>
 
         <!-- Saved places list -->
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No Saved Locations"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:paddingTop="24dp"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSaved"
             android:layout_width="match_parent"

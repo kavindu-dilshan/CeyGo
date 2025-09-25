@@ -7,16 +7,15 @@ class SessionManager(context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
 
-    var rememberedUserId: Int
-        get() = prefs.getInt(KEY_USER_ID, NO_USER)
-        set(value) = prefs.edit().putInt(KEY_USER_ID, value).apply()
+    var rememberedUid: String?
+        get() = prefs.getString(KEY_UID, null)
+        set(value) = prefs.edit().putString(KEY_UID, value).apply()
 
     fun clearRemembered() {
-        prefs.edit().remove(KEY_USER_ID).apply()
+        prefs.edit().remove(KEY_UID).apply()
     }
 
     companion object {
-        private const val KEY_USER_ID = "remembered_user_id"
-        const val NO_USER = -1
+        private const val KEY_UID = "remembered_uid"
     }
 }

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "273399212029",
+    "project_id": "ceygo-database",
+    "storage_bucket": "ceygo-database.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273399212029:android:7c2f3dc1f72838d5b1db94",
+        "android_client_info": {
+          "package_name": "com.example.ceygo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273399212029-jlghg4rl05laa44scjv4umjs477v3aqc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ceygo",
+            "certificate_hash": "5801be56e66f2939815612455e6c4792a7d9ffbb"
+          }
+        },
+        {
+          "client_id": "273399212029-bh4gqh4btdu8vr6i2itq2d7q2ba2fsbq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs-pTiy3wmfnB7I_D7gkXH0e2_zXtU9so"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273399212029-bh4gqh4btdu8vr6i2itq2d7q2ba2fsbq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
