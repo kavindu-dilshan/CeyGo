@@ -16,4 +16,15 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.CeyGo</item>
     </style>
+
+    <style name="Widget.App.Button.GoogleButtonStyle" parent="Widget.Material3.Button">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button.GoogleButtonStyle</item>
+        <item name="strokeColor">@color/google_btn_stroke_day</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Button.GoogleButtonStyle" parent="ThemeOverlay.Material3.Button">
+        <item name="colorContainer">@color/white</item>
+        <item name="colorOnContainer">@color/google_btn_font_day</item>
+    </style>
 </resources>

@@ -7,5 +7,5 @@
     <font
         app:fontStyle="normal"
         app:fontWeight="700"
-        app:font="@font/productsans_bold" />
+        app:font="@font/productsns_bold" />
 </font-family>

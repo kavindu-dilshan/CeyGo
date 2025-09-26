@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:layout_marginBottom="72dp">
+        android:layout_marginBottom="80dp">
 
         <!-- Greeting + avatar -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -80,45 +80,13 @@
                 android:inputType="text"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Category chips -->
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:chipSpacing="8dp">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipWestern"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Western"
-                android:checked="true"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipSabaragamuwa"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sabaragamuwa"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipSouthern"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Southern"/>
-        </com.google.android.material.chip.ChipGroup>
-
         <!-- Vertical list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPlaces"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
+            android:layout_marginTop="8dp"
             android:paddingVertical="12dp"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

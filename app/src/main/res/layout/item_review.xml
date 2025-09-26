@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingBottom="12dp">
 
@@ -10,12 +11,14 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
 
-        <ImageView
+
+
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgAvatar"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/ic_profile"
-            android:contentDescription="@null"/>
+            android:src="@drawable/ic_avatar_placeholder"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.Corner.Full"/>
 
         <TextView
             android:id="@+id/tvAuthor"
@@ -33,6 +36,8 @@
             android:layout_height="wrap_content"
             android:isIndicator="true"
             android:numStars="5"
+            android:progressTint="@color/starYellow"
+            android:secondaryProgressTint="@color/starYellow"
             android:stepSize="1"/>
     </LinearLayout>
 

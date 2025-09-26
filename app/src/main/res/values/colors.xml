@@ -8,4 +8,9 @@
     <color name="starYellow">#FFC107</color>
     <color name="textPrimary">#000205</color>
     <color name="textSecondary">#57646A</color>
+    <color name="google_btn_neutral">#F2F2F2</color>
+    <color name="google_btn_font_night">#E3E3E3</color>
+    <color name="google_btn_font_day">#1F1F1F</color>
+    <color name="google_btn_stroke_day">#747775</color>
+    <color name="google_btn_stroke_night">#8E918F</color>
 </resources>

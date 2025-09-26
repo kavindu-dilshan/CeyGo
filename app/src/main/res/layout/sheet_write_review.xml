@@ -10,23 +10,43 @@
         android:text="Give a Review"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:layout_width="wrap_content"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <RatingBar
-        android:id="@+id/ratingInput"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="5"
-        android:stepSize="1"
-        android:rating="4"
-        android:layout_marginTop="8dp"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RatingBar
+            android:id="@+id/ratingInput"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            android:rating="4"
+            android:layout_marginTop="8dp"
+            android:progressTint="@color/starYellow"
+            android:secondaryProgressTint="@color/starYellow" />
+
+    </FrameLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        app:boxStrokeColor="@color/primaryBlue"
+        app:boxStrokeWidth="2dp"
+        app:hintEnabled="false"
+        app:boxCornerRadiusBottomStart="24dp"
+        app:boxCornerRadiusBottomEnd="24dp"
+        app:boxCornerRadiusTopStart="24dp"
+        app:boxCornerRadiusTopEnd="24dp"
+        app:boxStrokeWidthFocused="3dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etReview"
@@ -42,6 +62,7 @@
         android:id="@+id/btnSend"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:textColor="@color/white"
         android:text="Send a Review"
         app:cornerRadius="28dp"
         app:backgroundTint="@color/primaryBlue"
