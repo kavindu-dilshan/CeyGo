@@ -4,4 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primaryBlue">#377DFF</color>
     <color name="gray_600">#6B7280</color>
+    <color name="gray_200">#E6E8EC</color>
+    <color name="starYellow">#FFC107</color>
+    <color name="textPrimary">#000205</color>
+    <color name="textSecondary">#57646A</color>
 </resources>

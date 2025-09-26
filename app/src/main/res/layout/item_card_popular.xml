@@ -1,96 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="260dp"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginEnd="12dp"
-    app:cardUseCompatPadding="true"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp">
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="20dp"
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <ImageView
+        <!-- Top image with ONLY top corners rounded -->
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgCover"
             android:layout_width="0dp"
-            android:layout_height="140dp"
+            android:layout_height="168dp"
             android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.AllRounded16" />
 
-        <!-- Rating pill -->
+        <!-- Rating pill (small, dark translucent) -->
         <LinearLayout
             android:id="@+id/ratingChip"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:layout_margin="8dp"
-            android:paddingHorizontal="10dp"
-            android:background="@drawable/bg_chip"
+            android:layout_height="24dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_chip_dark"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toTopOf="@id/imgCover"
-            app:layout_constraintStart_toStartOf="@id/imgCover">
+            android:paddingHorizontal="8dp"
+            app:layout_constraintStart_toStartOf="@id/imgCover"
+            app:layout_constraintTop_toTopOf="@id/imgCover">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_star_filled"/>
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_star_filled"
+                app:tint="@color/starYellow" />
 
             <TextView
                 android:id="@+id/tvRating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
+                android:layout_marginEnd="4dp"
                 android:text="5.0"
-                android:textStyle="bold"/>
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Heart icon -->
+        <!-- Heart inside small white circle -->
         <ImageView
             android:id="@+id/btnFav"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/ic_heart"
-            android:background="@drawable/bg_icon_circle"
-            android:padding="4dp"
-            app:layout_constraintTop_toTopOf="@id/imgCover"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_chip_dark"
+            android:padding="6dp"
+            android:src="@drawable/ic_heart_outline"
             app:layout_constraintEnd_toEndOf="@id/imgCover"
-            android:layout_margin="8dp"/>
+            app:layout_constraintTop_toTopOf="@id/imgCover"
+            app:tint="@color/white" />
 
+        <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="Sigiriya"
-            android:textStyle="bold"
+            android:textColor="@android:color/black"
             android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/imgCover"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btnGo"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnGo"/>
+            app:layout_constraintTop_toBottomOf="@id/imgCover" />
 
+        <!-- Subtitle -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="14dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Sigiriya, Sri Lanka."
-            android:textColor="@color/gray_600"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            android:textColor="#667085"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnGo"
             app:layout_constraintStart_toStartOf="@id/tvTitle"
-            app:layout_constraintEnd_toStartOf="@id/btnGo"/>
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
+        <!-- Blue circular arrow -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnGo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:layout_marginTop="8dp"
-            app:srcCompat="@drawable/ic_arrow_right"
-            app:tint="@android:color/white"
+            android:layout_marginEnd="14dp"
+            android:foreground="@drawable/ic_arrow_right"
+            android:foregroundGravity="center"
+            android:foregroundTint="@color/white"
             app:backgroundTint="@color/primaryBlue"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FAB.Circle"
+            app:fabSize="auto"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imgCover"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:tint="@android:color/white"
+            app:useCompatPadding="false"
+            app:elevation="0dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

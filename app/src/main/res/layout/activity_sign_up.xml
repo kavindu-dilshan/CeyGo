@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_home_gradient"
+    android:background="@drawable/bg_profile_gradient"
     android:padding="16dp">
 
     <!-- Back -->
@@ -34,7 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Set up your profile and travel smart."
-        android:textColor="#99333333"
+        android:textColor="@color/textSecondary"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -110,7 +110,7 @@
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="********"
+            android:hint="Enter your password"
             android:inputType="textPassword"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -132,7 +132,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Or Sign up with"
-        android:textColor="#55333333"
+        android:textColor="@color/textSecondary"
         app:layout_constraintTop_toBottomOf="@id/btnSignUp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

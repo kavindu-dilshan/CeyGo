@@ -4,7 +4,11 @@
         <item name="colorPrimary">@color/primaryBlue</item>
     </style>
 
-    <style name="Theme.CeyGo" parent="Base.Theme.CeyGo" />
+    <style name="Theme.CeyGo" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Global font -->
+        <item name="android:fontFamily">@font/productsans</item>
+        <item name="fontFamily">@font/productsans</item>
+    </style>
 
     <!-- Splash theme shown at cold start -->
     <style name="Theme.CeyGo.Splash" parent="Theme.SplashScreen">

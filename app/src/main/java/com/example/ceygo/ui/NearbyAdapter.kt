@@ -24,7 +24,7 @@ class NearbyAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_card_nearby, parent, false))
+        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_card_popular, parent, false))
 
     override fun getItemCount() = items.size
 
