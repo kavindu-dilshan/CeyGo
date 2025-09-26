@@ -50,7 +50,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         view.findViewById<View>(R.id.btnDelete)?.setOnClickListener {
-            deleteAccount()
+            logout()
         }
 
         // Load current user
@@ -107,14 +107,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
-    private fun deleteAccount() {
+    private fun logout() {
         val root = view ?: return
-        viewLifecycleOwner.lifecycleScope.launch {
-            auth.deleteCurrentUser()
-            Snackbar.make(root, "Account deleted", Snackbar.LENGTH_SHORT).show()
-            // Navigate to SignIn
-            startActivity(Intent(requireContext(), SignInActivity::class.java))
-            activity?.finish()
-        }
+        auth.signOut()
+        Snackbar.make(root, "Logged out", Snackbar.LENGTH_SHORT).show()
+        startActivity(Intent(requireContext(), SignInActivity::class.java))
+        activity?.finish()
     }
 }

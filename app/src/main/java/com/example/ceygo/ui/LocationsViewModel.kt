@@ -10,4 +10,5 @@ class LocationsViewModel : ViewModel() {
     fun location(id: String) = LocationsRepository.location(id)
     fun addReview(id: String, review: Review) = LocationsRepository.addReview(id, review)
     fun reviews(id: String): Flow<List<Review>> = FirestoreRepository.observeReviews(id)
+    suspend fun deleteReview(locationId: String, reviewId: String) = FirestoreRepository.deleteReview(locationId, reviewId)
 }

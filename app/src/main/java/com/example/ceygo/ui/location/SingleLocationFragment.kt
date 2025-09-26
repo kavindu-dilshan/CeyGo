@@ -38,6 +38,25 @@ class SingleLocationFragment : Fragment(R.layout.fragment_single_location) {
             adapter = reviewAdapter
             isNestedScrollingEnabled = false
         }
+        // Handle long-press delete on own reviews
+        reviewAdapter.onLongPress = { review ->
+            if (review.isOwner) {
+                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("Delete review")
+                    .setMessage("Are you sure you want to delete this review?")
+                    .setPositiveButton("Delete") { _, _ ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            try {
+                                vm.deleteReview(locationId, review.id)
+                            } catch (e: Exception) {
+                                // No-op; Firestore rules or checks will prevent unauthorized deletions
+                            }
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
 
         // Read more toggle
         val tvDesc = view.findViewById<TextView>(R.id.tvDescription)

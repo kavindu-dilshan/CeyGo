@@ -6,6 +6,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -63,10 +65,22 @@ class AuthRepository(private val session: SessionManager) {
         if (name.isBlank()) return@withContext Result.failure(IllegalArgumentException("Name is required"))
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) return@withContext Result.failure(IllegalArgumentException("Invalid email"))
         try {
+            // Upload avatar to Firebase Storage if provided; then set profile URL to download URL
+            var uploadedAvatarUrl: String? = null
+            if (!avatarUri.isNullOrBlank()) {
+                try {
+                    val storage = FirebaseStorage.getInstance()
+                    val ref = storage.reference.child("avatars/${'$'}{user.uid}.jpg")
+                    val local = Uri.parse(avatarUri)
+                    ref.putFile(local).await()
+                    uploadedAvatarUrl = ref.downloadUrl.await().toString()
+                } catch (_: Exception) { /* ignore upload errors; proceed without changing avatar */ }
+            }
+
             // Update profile
             val profileReq = com.google.firebase.auth.userProfileChangeRequest {
                 displayName = name
-                avatarUri?.let { photoUri = android.net.Uri.parse(it) }
+                uploadedAvatarUrl?.let { photoUri = Uri.parse(it) }
             }
             user.updateProfile(profileReq).await()
             if (user.email != email) user.updateEmail(email).await()
@@ -76,7 +90,7 @@ class AuthRepository(private val session: SessionManager) {
                 mapOf(
                     "name" to name,
                     "email" to email,
-                    "avatarUri" to avatarUri
+                    "avatarUri" to (uploadedAvatarUrl ?: avatarUri)
                 ),
                 com.google.firebase.firestore.SetOptions.merge()
             ).await()
@@ -86,13 +100,9 @@ class AuthRepository(private val session: SessionManager) {
         }
     }
 
-    suspend fun deleteCurrentUser() = withContext(Dispatchers.IO) {
-        val user = auth.currentUser ?: return@withContext
-        try {
-            firestore.collection("users").document(user.uid).delete().await()
-            user.delete().await()
-            session.clearRemembered()
-        } catch (_: Exception) { }
+    fun signOut() {
+        auth.signOut()
+        session.clearRemembered()
     }
 
     suspend fun signInWithGoogle(account: GoogleSignInAccount): Result<Unit> = withContext(Dispatchers.IO) {

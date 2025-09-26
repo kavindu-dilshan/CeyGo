@@ -90,17 +90,23 @@ object FirestoreRepository {
             .orderBy("createdAt")
             .addSnapshotListener { snap, err ->
                 if (err != null) { trySend(emptyList()); return@addSnapshotListener }
+                val currentUid = auth.currentUser?.uid
                 val list = snap?.documents?.mapNotNull { d ->
                     val author = d.getString("userName") ?: ""
+                    val userId = d.getString("userId") ?: ""
+                    val userPhoto = d.getString("userPhoto")
                     val rating = (d.getLong("rating") ?: 0L).toInt()
                     val text = d.getString("text") ?: ""
                     val createdAt = d.getLong("createdAt") ?: 0L
                     Review(
                         id = d.id,
+                        userId = userId,
                         author = author,
+                        userPhoto = userPhoto,
                         rating = rating,
                         text = text,
-                        createdAt = createdAt
+                        createdAt = createdAt,
+                        isOwner = (currentUid != null && currentUid == userId)
                     )
                 } ?: emptyList()
                 trySend(list)
@@ -113,6 +119,7 @@ object FirestoreRepository {
         val data = mapOf(
             "userId" to user.uid,
             "userName" to (user.displayName ?: user.email ?: "User"),
+            "userPhoto" to (user.photoUrl?.toString()),
             "rating" to rating,
             "text" to reviewText,
             "createdAt" to System.currentTimeMillis()

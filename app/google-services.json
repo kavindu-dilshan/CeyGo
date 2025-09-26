@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "273399212029-p9ubi6v4iabutn89443j1ojt75gtm79n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ceygo",
+            "certificate_hash": "d085374a609262c8176d62c5867c5412bb1c6eff"
+          }
+        },
+        {
           "client_id": "273399212029-bh4gqh4btdu8vr6i2itq2d7q2ba2fsbq.apps.googleusercontent.com",
           "client_type": 3
         }

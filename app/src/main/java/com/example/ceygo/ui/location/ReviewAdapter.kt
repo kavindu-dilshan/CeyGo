@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ceygo.R
 import com.example.ceygo.model.Review
+import android.widget.ImageView
+import coil.load
+import androidx.core.content.ContextCompat
 
 class ReviewAdapter :
     ListAdapter<Review, ReviewAdapter.VH>(Diff) {
@@ -20,10 +23,13 @@ class ReviewAdapter :
     }
 
     class VH(view: View) : RecyclerView.ViewHolder(view) {
+        val imgAvatar: ImageView = view.findViewById(R.id.imgAvatar)
         val tvAuthor: TextView = view.findViewById(R.id.tvAuthor)
         val tvText: TextView = view.findViewById(R.id.tvText)
         val rating: RatingBar = view.findViewById(R.id.ratingSmall)
     }
+
+    var onLongPress: ((Review) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val v = LayoutInflater.from(parent.context)
@@ -32,9 +38,23 @@ class ReviewAdapter :
     }
 
     override fun onBindViewHolder(h: VH, pos: Int) {
-        val it = getItem(pos)
-        h.tvAuthor.text = it.author
-        h.tvText.text = it.text
-        h.rating.rating = it.rating.toFloat()
+        val review = getItem(pos)
+        h.tvAuthor.text = review.author
+        h.tvText.text = review.text
+        h.rating.rating = review.rating.toFloat()
+        // Load avatar (fallback icon is set in XML)
+        review.userPhoto?.let { url -> if (url.isNotBlank()) h.imgAvatar.load(url) }
+        // Highlight owned reviews by tinting author text
+        val color = if (review.isOwner) R.color.primaryBlue else android.R.color.black
+        h.tvAuthor.setTextColor(ContextCompat.getColor(h.itemView.context, color))
+        // Long press to delete only if owner
+        h.itemView.setOnLongClickListener {
+            if (review.isOwner) {
+                onLongPress?.invoke(review)
+                true
+            } else {
+                false
+            }
+        }
     }
 }
